@@ -1,0 +1,11 @@
+[project]
+name = "crapi-sast-dast-study"
+version = "0.1.0"
+description = "Reproducible Semgrep/ZAP comparison on OWASP crAPI"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-q"
+
