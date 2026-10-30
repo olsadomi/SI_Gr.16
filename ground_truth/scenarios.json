@@ -1,0 +1,31 @@
+{
+  "target_commit": "b5fc307f3e5f875809b095b771108ef342a33724",
+  "scenarios": [
+    {
+      "scenario_id": "CRAPI-BOLA-VEHICLE-LOCATION",
+      "title": "Access another user's vehicle location",
+      "category": "OWASP API1:2023 Broken Object Level Authorization",
+      "cwe": "CWE-639",
+      "endpoint": "/identity/api/v2/vehicle/{vehicleId}/location",
+      "method": "GET",
+      "source_locations": [
+        "services/identity/src/main/java/com/crapi/controller/VehicleController.java"
+      ],
+      "preconditions": [
+        "attacker is authenticated as test@example.com",
+        "vehicle identifier belongs to adam007@example.com"
+      ],
+      "oracle": {
+        "vulnerable_when": "attacker receives HTTP 200 and response carId equals the victim vehicle ID",
+        "protected_statuses": [401, 403, 404]
+      },
+      "eligible_conditions": ["S0", "S1", "D0", "D1"],
+      "evidence": [
+        "docs/challenges.md challenge 1",
+        "docs/challengeSolutions.md challenge 1",
+        "manual source inspection at pinned commit"
+      ]
+    }
+  ]
+}
+

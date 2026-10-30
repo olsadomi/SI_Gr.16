@@ -1,0 +1,13 @@
+{
+  "cases": [
+    {
+      "scenario_id": "CRAPI-BOLA-VEHICLE-LOCATION",
+      "method": "GET",
+      "path": "/identity/api/v2/vehicle/{victim_vehicle_id}/location",
+      "expected_identifier_field": "carId",
+      "expected_identifier_variable": "victim_vehicle_id",
+      "protected_statuses": [401, 403, 404]
+    }
+  ]
+}
+
