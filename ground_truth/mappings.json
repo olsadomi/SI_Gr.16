@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "mappings": [
+    {
+      "condition": "S1",
+      "match": {"rule_id": "crapi-controller-path-object-without-request-context"},
+      "scenario_ids": ["CRAPI-BOLA-VEHICLE-LOCATION"],
+      "classification": "true_positive",
+      "rationale": "At the pinned crAPI commit the matched controller passes the path-controlled vehicle UUID to getVehicleLocation without providing authenticated-user context; the official challenge and dynamic oracle confirm the authorization failure."
+    },
+    {
+      "condition": "D1",
+      "match": {"rule_id": "bola-ownership-swap"},
+      "scenario_ids": ["CRAPI-BOLA-VEHICLE-LOCATION"],
+      "classification": "true_positive",
+      "rationale": "The targeted request uses the attacker's token and the pinned victim vehicle identifier; the response oracle confirms disclosure."
+    }
+  ]
+}
+
