@@ -4,9 +4,10 @@ This repository implements a controlled comparison of Semgrep (SAST) and OWASP Z
 
 ## Research questions
 
-1. Which eligible crAPI scenarios are detected by Semgrep and ZAP, and what scenario coverage and finding precision does each achieve?
-2. To what extent do standard and project-extended static and dynamic configurations detect selected BOLA scenarios?
-3. How much additional coverage is obtained by combining SAST and DAST, and what execution time does it require?
+1. **RQ1:** Which of the documented crAPI vulnerability scenarios are detected by the static analysis tool (Semgrep) and by the dynamic analysis tool (OWASP ZAP)?
+2. **RQ2:** To what extent can each approach detect authorization weaknesses, in particular BOLA, under the tested configurations (S0, S1, D0, D1)?
+3. **RQ3:** How do the two tools compare in terms of detection coverage, precision, false positives, and execution time?
+4. **RQ4:** Do static and dynamic testing provide complementary coverage when their results are combined?
 
 ## Safety boundary
 

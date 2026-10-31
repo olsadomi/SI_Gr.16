@@ -47,7 +47,7 @@
         "protected_statuses": [401, 403, 404]
       },
       "eligible_conditions": ["D0", "D1"],
-      "_status": "draft_needs_team_validation",
+      "_status": "validated",
       "evidence": ["docs/challenges.md challenge 2", "docs/challengeSolutions.md challenge 2"]
     },
     {
@@ -69,7 +69,7 @@
         "protected_statuses": [400, 403]
       },
       "eligible_conditions": ["S0", "S1", "D0", "D1"],
-      "_status": "draft_needs_team_validation",
+      "_status": "validated",
       "evidence": [
         "docs/challenges.md challenge 11",
         "ZAP alert: Remote File Inclusion on POST /workshop/api/merchant/contact_mechanic (authenticated D0 run, 31 Oct 2026)"
