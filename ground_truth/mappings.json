@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "_note": "Human-reviewed classification of tool findings. The BOLA harness (D1) classifies itself through its oracle in parse_bola, so no D1 entry is needed here. The S1 entry below is validated. The entries under _draft_zap_mappings are NOT applied; move one into mappings only after the team manually confirms the finding against the scenario (per docs/methodology.md).",
+  "_note": "Human-reviewed classification of tool findings. The BOLA harness (D1) classifies itself through its oracle in parse_bola, so no D1 entry is needed here. The entries below are validated. SQLi stays under _draft_zap_mappings until per-URL review.",
   "mappings": [
     {
       "condition": "S1",
@@ -10,17 +10,27 @@
       },
       "scenario_ids": ["CRAPI-BOLA-VEHICLE-LOCATION"],
       "classification": "true_positive",
-      "rationale": "At the pinned crAPI commit VehicleController.getLocationBOLA passes the path-controlled vehicle UUID to getVehicleLocation without an ownership check; the official challenge and the dynamic oracle confirm it. The rule also fires on ProfileController (video_id): that is a separate candidate left unverified for manual review."
-    }
-  ],
-  "_draft_zap_mappings": [
+      "rationale": "At the pinned crAPI commit VehicleController.getLocationBOLA passes the path-controlled vehicle UUID to getVehicleLocation without an ownership check; the official challenge and the dynamic oracle confirm it."
+    },
+    {
+      "condition": "S1",
+      "match": {
+        "rule_id_suffix": "crapi-controller-path-object-without-request-context",
+        "location_path_contains": "ProfileController.java"
+      },
+      "scenario_ids": [],
+      "classification": "false_positive",
+      "rationale": "Dynamic check (31 Oct 2026): as test@example.com, GET /identity/api/v2/user/videos/{id} returns the attacker's own video (id 4, 200) while all other IDs return 404. ProfileService scopes the lookup by the request user, so the rule's missing-authorization hypothesis does not hold here."
+    },
     {
       "condition": "D0",
       "match": {"rule_id": "7"},
       "scenario_ids": ["CRAPI-SSRF-CONTACT-MECHANIC"],
       "classification": "true_positive",
-      "rationale": "DRAFT - verify manually. ZAP Remote File Inclusion (pluginId 7) fired on POST /workshop/api/merchant/contact_mechanic, which is the SSRF sink. Confirm the server actually issues the outbound request before promoting."
-    },
+      "rationale": "Confirmed by source + tool + docs: workshop merchant/views.py calls requests.get(mechanic_api) with a user-controlled URL (SSRF sink); ZAP Remote File Inclusion (pluginId 7) fired on POST /workshop/api/merchant/contact_mechanic; crAPI Challenge 11 documents this SSRF."
+    }
+  ],
+  "_draft_zap_mappings": [
     {
       "condition": "D0",
       "match": {"rule_id": "40018"},
