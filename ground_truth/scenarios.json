@@ -1,5 +1,6 @@
 {
   "target_commit": "b5fc307f3e5f875809b095b771108ef342a33724",
+  "_note": "DRAFT ground truth. Scenario 1 is validated. Scenarios 2-8 are structured drafts derived from the official crAPI challenge docs; each MUST be manually reproduced and confirmed by the team (per docs/methodology.md) before it is used in final metric denominators. Verify the exact source_locations line numbers and the eligible_conditions for each before the main experiment.",
   "scenarios": [
     {
       "scenario_id": "CRAPI-BOLA-VEHICLE-LOCATION",
@@ -20,12 +21,153 @@
         "protected_statuses": [401, 403, 404]
       },
       "eligible_conditions": ["S0", "S1", "D0", "D1"],
+      "_status": "validated",
       "evidence": [
         "docs/challenges.md challenge 1",
         "docs/challengeSolutions.md challenge 1",
         "manual source inspection at pinned commit"
       ]
+    },
+    {
+      "scenario_id": "CRAPI-BOLA-MECHANIC-REPORT",
+      "title": "Access mechanic reports of other users",
+      "category": "OWASP API1:2023 Broken Object Level Authorization",
+      "cwe": "CWE-639",
+      "endpoint": "/workshop/api/mechanic/mechanic_report",
+      "method": "GET",
+      "source_locations": [
+        "services/workshop/crapi/mechanic/views.py (GetReportView.get, report_id lookup with no owner check)"
+      ],
+      "preconditions": [
+        "attacker is authenticated as test@example.com",
+        "report_id refers to a report created by another user"
+      ],
+      "oracle": {
+        "vulnerable_when": "attacker receives HTTP 200 for a report_id owned by another user",
+        "protected_statuses": [401, 403, 404]
+      },
+      "eligible_conditions": ["D0", "D1"],
+      "_status": "draft_needs_team_validation",
+      "evidence": ["docs/challenges.md challenge 2", "docs/challengeSolutions.md challenge 2"]
+    },
+    {
+      "scenario_id": "CRAPI-SSRF-CONTACT-MECHANIC",
+      "title": "SSRF via the contact-mechanic mechanic_api field",
+      "category": "OWASP API7:2023 Server Side Request Forgery",
+      "cwe": "CWE-918",
+      "endpoint": "/workshop/api/merchant/contact_mechanic",
+      "method": "POST",
+      "source_locations": [
+        "services/workshop/crapi/merchant/views.py (ContactMechanicView.post, requests.get(request_data['mechanic_api']))"
+      ],
+      "preconditions": [
+        "attacker is authenticated",
+        "mechanic_api is a user-controlled URL passed to a server-side HTTP request"
+      ],
+      "oracle": {
+        "vulnerable_when": "the server performs an outbound request to an attacker-controlled URL",
+        "protected_statuses": [400, 403]
+      },
+      "eligible_conditions": ["S0", "S1", "D0", "D1"],
+      "_status": "draft_needs_team_validation",
+      "evidence": [
+        "docs/challenges.md challenge 11",
+        "ZAP alert: Remote File Inclusion on POST /workshop/api/merchant/contact_mechanic (authenticated D0 run, 31 Oct 2026)"
+      ]
+    },
+    {
+      "scenario_id": "CRAPI-BFLA-DELETE-VIDEO",
+      "title": "Delete another user's video via the admin endpoint",
+      "category": "OWASP API5:2023 Broken Function Level Authorization",
+      "cwe": "CWE-285",
+      "endpoint": "/identity/api/v2/admin/videos/{videoId}",
+      "method": "DELETE",
+      "source_locations": [
+        "services/identity/src/main/java/com/crapi/controller (admin video controller)"
+      ],
+      "preconditions": [
+        "attacker is a normal user (ROLE_USER)",
+        "the endpoint is an admin (ROLE_ADMIN) function"
+      ],
+      "oracle": {
+        "vulnerable_when": "a non-admin user can invoke the admin delete and receives 2xx",
+        "protected_statuses": [401, 403]
+      },
+      "eligible_conditions": ["D0", "D1"],
+      "_status": "draft_needs_team_validation",
+      "evidence": ["docs/challenges.md challenge 7"]
+    },
+    {
+      "scenario_id": "CRAPI-EXCESSIVE-DATA-POSTS",
+      "title": "Community posts leak other users' vehicle ID and email",
+      "category": "OWASP API3:2023 Broken Object Property Level Authorization",
+      "cwe": "CWE-213",
+      "endpoint": "/community/api/v2/community/posts/recent",
+      "method": "GET",
+      "source_locations": [
+        "services/community (post serializer returning vehicleid/email)"
+      ],
+      "preconditions": ["attacker is authenticated"],
+      "oracle": {
+        "vulnerable_when": "the response exposes internal fields (vehicleid, email) of other users",
+        "protected_statuses": [401]
+      },
+      "eligible_conditions": ["D0", "D1"],
+      "_status": "draft_needs_team_validation",
+      "evidence": ["docs/challenges.md challenge 4", "docs/challengeSolutions.md challenge 1 step 7"]
+    },
+    {
+      "scenario_id": "CRAPI-SQLI-COUPON",
+      "title": "SQL injection in the coupon validation flow",
+      "category": "OWASP API8:2023 Security Misconfiguration / Injection",
+      "cwe": "CWE-89",
+      "endpoint": "/community/api/v2/coupon/validate-coupon",
+      "method": "POST",
+      "source_locations": ["services/community (coupon handler)"],
+      "preconditions": ["attacker is authenticated"],
+      "oracle": {
+        "vulnerable_when": "crafted coupon_code alters the SQL query result",
+        "protected_statuses": [400]
+      },
+      "eligible_conditions": ["S0", "S1", "D0", "D1"],
+      "_status": "draft_needs_team_validation",
+      "evidence": ["docs/challenges.md challenge 13"]
+    },
+    {
+      "scenario_id": "CRAPI-NOSQLI-COUPON",
+      "title": "NoSQL injection to redeem coupons without a valid code",
+      "category": "OWASP API8:2023 Injection",
+      "cwe": "CWE-943",
+      "endpoint": "/community/api/v2/coupon/new-coupon",
+      "method": "POST",
+      "source_locations": ["services/community (coupon handler, MongoDB query)"],
+      "preconditions": ["attacker is authenticated"],
+      "oracle": {
+        "vulnerable_when": "a NoSQL operator payload returns a valid coupon without knowing the code",
+        "protected_statuses": [400, 404]
+      },
+      "eligible_conditions": ["D0", "D1"],
+      "_status": "draft_needs_team_validation",
+      "evidence": ["docs/challenges.md challenge 12"]
+    },
+    {
+      "scenario_id": "CRAPI-UNAUTH-ACCESS",
+      "title": "Endpoint that performs no authentication check",
+      "category": "OWASP API2:2023 Broken Authentication",
+      "cwe": "CWE-306",
+      "endpoint": "/workshop/api/mechanic/receive_report",
+      "method": "GET",
+      "source_locations": [
+        "services/workshop/crapi/mechanic/views.py (ReceiveReportView has no jwt_auth_required)"
+      ],
+      "preconditions": ["no authentication token supplied"],
+      "oracle": {
+        "vulnerable_when": "the endpoint is reachable and acts without any authentication",
+        "protected_statuses": [401, 403]
+      },
+      "eligible_conditions": ["S0", "S1", "D0", "D1"],
+      "_status": "draft_needs_team_validation",
+      "evidence": ["docs/challenges.md challenge 14"]
     }
   ]
 }
-
