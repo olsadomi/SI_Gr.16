@@ -1,0 +1,23 @@
+rules:
+  - id: crapi-controller-path-object-without-request-context
+    languages: [java]
+    severity: WARNING
+    message: >-
+      Object identifier reaches a service lookup without authenticated-user context.
+      Review for object-level authorization. This is a project-specific hypothesis
+      and requires manual validation; it is not automatically a confirmed BOLA.
+    metadata:
+      category: security
+      confidence: MEDIUM
+      cwe: "CWE-639: Authorization Bypass Through User-Controlled Key"
+      technology: [spring]
+    patterns:
+      - pattern-inside: |
+          @GetMapping(...)
+          public $RET $METHOD(@PathVariable(...) $TYPE $OBJECT_ID) {
+            ...
+          }
+      - pattern: $SERVICE.$LOOKUP($OBJECT_ID)
+      - pattern-not-inside: |
+          ... $SERVICE.$CHECK(..., $REQUEST, ...); ...
+
