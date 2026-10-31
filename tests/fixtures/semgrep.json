@@ -1,0 +1,1 @@
+{"results":[{"check_id":"java.lang.security.audit.test-rule","path":"services/identity/Test.java","start":{"line":10,"col":5},"extra":{"message":"Test alert","severity":"WARNING"}}]}

@@ -1,0 +1,1 @@
+{"condition":"D1","results":[{"scenario_id":"CRAPI-BOLA-VEHICLE-LOCATION","rule_id":"bola-ownership-swap","request":{"method":"GET","path":"/vehicle/id/location"},"oracle":{"vulnerable":true}}]}
