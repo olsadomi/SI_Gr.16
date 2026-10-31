@@ -6,7 +6,12 @@ from typing import Any
 CONDITIONS = ("S0", "S1", "D0", "D1")
 
 
-def calculate(findings: list[dict[str, Any]], ground_truth: dict[str, Any]) -> dict[str, Any]:
+def calculate(
+    findings: list[dict[str, Any]],
+    ground_truth: dict[str, Any],
+    durations: dict[str, float] | None = None,
+) -> dict[str, Any]:
+    durations = durations or {}
     scenarios = {item["scenario_id"]: item for item in ground_truth["scenarios"]}
     detected: dict[str, set[str]] = {condition: set() for condition in CONDITIONS}
     metrics: dict[str, Any] = {}
@@ -31,12 +36,14 @@ def calculate(findings: list[dict[str, Any]], ground_truth: dict[str, Any]) -> d
             "coverage": len(hit) / len(eligible) if eligible else None,
             "finding_counts": dict(sorted(counts.items())),
             "precision": precision,
+            "duration_seconds": durations.get(condition),
         }
 
     sast = detected["S1"]
     dynamic = detected["D0"] | detected["D1"]
     union = sast | dynamic
     intersection = sast & dynamic
+    total_runtime = sum(v for v in durations.values() if v is not None) if durations else None
     metrics["combined"] = {
         "scenario_ids_detected": sorted(union),
         "detected_scenarios": len(union),
@@ -44,6 +51,6 @@ def calculate(findings: list[dict[str, Any]], ground_truth: dict[str, Any]) -> d
         "dynamic_only": sorted(dynamic - sast),
         "both": sorted(intersection),
         "jaccard_overlap": len(intersection) / len(union) if union else None,
+        "total_runtime_seconds": round(total_runtime, 6) if total_runtime is not None else None,
     }
     return metrics
-

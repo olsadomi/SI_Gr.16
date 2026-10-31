@@ -3,21 +3,32 @@ rules:
     languages: [java]
     severity: WARNING
     message: >-
-      Object identifier reaches a service lookup without authenticated-user context.
-      Review for object-level authorization. This is a project-specific hypothesis
-      and requires manual validation; it is not automatically a confirmed BOLA.
+      A path-controlled object identifier reaches a service lookup inside a Spring
+      controller method that never calls an ownership/authorization check. Review for
+      object-level authorization (BOLA). This is a project-specific hypothesis and
+      requires manual validation; it is not automatically a confirmed BOLA.
     metadata:
       category: security
       confidence: MEDIUM
       cwe: "CWE-639: Authorization Bypass Through User-Controlled Key"
+      owasp: "API1:2023 Broken Object Level Authorization"
       technology: [spring]
     patterns:
+      - pattern: $SERVICE.$LOOKUP(..., $OBJECT_ID, ...)
       - pattern-inside: |
           @GetMapping(...)
-          public $RET $METHOD(@PathVariable(...) $TYPE $OBJECT_ID) {
+          $RET $METHOD(..., @PathVariable(...) $TYPE $OBJECT_ID, ...) {
             ...
           }
-      - pattern: $SERVICE.$LOOKUP($OBJECT_ID)
       - pattern-not-inside: |
-          ... $SERVICE.$CHECK(..., $REQUEST, ...); ...
-
+          $RET2 $METHOD2(...) {
+            ...
+            $SVC.checkOwnership(...);
+            ...
+          }
+      - pattern-not-inside: |
+          $RET2 $METHOD2(...) {
+            ...
+            $SVC.$CHECK(..., $REQ, ...);
+            return $SERVICE.$LOOKUP(..., $OBJECT_ID, ...);
+          }

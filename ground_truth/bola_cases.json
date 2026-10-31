@@ -4,10 +4,18 @@
       "scenario_id": "CRAPI-BOLA-VEHICLE-LOCATION",
       "method": "GET",
       "path": "/identity/api/v2/vehicle/{victim_vehicle_id}/location",
+      "oracle_mode": "identifier_disclosure",
       "expected_identifier_field": "carId",
       "expected_identifier_variable": "victim_vehicle_id",
       "protected_statuses": [401, 403, 404]
+    },
+    {
+      "scenario_id": "CRAPI-BOLA-MECHANIC-REPORT",
+      "method": "GET",
+      "path": "/workshop/api/mechanic/mechanic_report?report_id={victim_report_id}",
+      "oracle_mode": "cross_user_access",
+      "protected_statuses": [401, 403, 404],
+      "_comment": "victim_report_id must be a report created by the victim account. Set CRAPI_VICTIM_REPORT_ID in .env. cross_user_access: vulnerable when the attacker token returns 200 for an object owned by the victim."
     }
   ]
 }
-

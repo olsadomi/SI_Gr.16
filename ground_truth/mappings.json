@@ -1,20 +1,32 @@
 {
-  "version": 1,
+  "version": 2,
+  "_note": "Human-reviewed classification of tool findings. The BOLA harness (D1) classifies itself through its oracle in parse_bola, so no D1 entry is needed here. The S1 entry below is validated. The entries under _draft_zap_mappings are NOT applied; move one into mappings only after the team manually confirms the finding against the scenario (per docs/methodology.md).",
   "mappings": [
     {
       "condition": "S1",
-      "match": {"rule_id": "crapi-controller-path-object-without-request-context"},
+      "match": {
+        "rule_id_suffix": "crapi-controller-path-object-without-request-context",
+        "location_path_contains": "VehicleController.java"
+      },
       "scenario_ids": ["CRAPI-BOLA-VEHICLE-LOCATION"],
       "classification": "true_positive",
-      "rationale": "At the pinned crAPI commit the matched controller passes the path-controlled vehicle UUID to getVehicleLocation without providing authenticated-user context; the official challenge and dynamic oracle confirm the authorization failure."
+      "rationale": "At the pinned crAPI commit VehicleController.getLocationBOLA passes the path-controlled vehicle UUID to getVehicleLocation without an ownership check; the official challenge and the dynamic oracle confirm it. The rule also fires on ProfileController (video_id): that is a separate candidate left unverified for manual review."
+    }
+  ],
+  "_draft_zap_mappings": [
+    {
+      "condition": "D0",
+      "match": {"rule_id": "7"},
+      "scenario_ids": ["CRAPI-SSRF-CONTACT-MECHANIC"],
+      "classification": "true_positive",
+      "rationale": "DRAFT - verify manually. ZAP Remote File Inclusion (pluginId 7) fired on POST /workshop/api/merchant/contact_mechanic, which is the SSRF sink. Confirm the server actually issues the outbound request before promoting."
     },
     {
-      "condition": "D1",
-      "match": {"rule_id": "bola-ownership-swap"},
-      "scenario_ids": ["CRAPI-BOLA-VEHICLE-LOCATION"],
-      "classification": "true_positive",
-      "rationale": "The targeted request uses the attacker's token and the pinned victim vehicle identifier; the response oracle confirms disclosure."
+      "condition": "D0",
+      "match": {"rule_id": "40018"},
+      "scenario_ids": ["CRAPI-SQLI-COUPON"],
+      "classification": "false_positive",
+      "rationale": "DRAFT - verify manually. Several ZAP SQL Injection (40018) alerts on /workshop/.../all used arithmetic payloads (offset=2-2) that are likely evaluated, not injected. Confirm each instance; classify per-URL rather than per-rule if they differ."
     }
   ]
 }
-
