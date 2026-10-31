@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/crapi-ground-truth.schema.json",
+  "type": "object",
+  "required": ["target_commit", "scenarios"],
+  "properties": {
+    "target_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "scenarios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["scenario_id", "title", "category", "endpoint", "method", "oracle", "eligible_conditions"],
+        "properties": {
+          "scenario_id": {"type": "string", "pattern": "^CRAPI-[A-Z0-9-]+$"},
+          "title": {"type": "string", "minLength": 1},
+          "category": {"type": "string", "minLength": 1},
+          "cwe": {"type": "string"},
+          "endpoint": {"type": "string", "pattern": "^/"},
+          "method": {"enum": ["GET", "POST", "PUT", "PATCH", "DELETE"]},
+          "source_locations": {"type": "array", "items": {"type": "string"}},
+          "oracle": {"type": "object"},
+          "eligible_conditions": {
+            "type": "array",
+            "items": {"enum": ["S0", "S1", "D0", "D1"]},
+            "uniqueItems": true
+          }
+        }
+      }
+    }
+  }
+}
+

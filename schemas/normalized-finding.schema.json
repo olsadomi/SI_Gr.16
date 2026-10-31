@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/normalized-finding.schema.json",
+  "type": "object",
+  "required": ["finding_id", "condition", "tool", "title", "severity", "location", "raw_reference", "classification"],
+  "properties": {
+    "finding_id": {"type": "string", "minLength": 1},
+    "condition": {"enum": ["S0", "S1", "D0", "D1"]},
+    "tool": {"enum": ["semgrep", "zap", "bola-harness"]},
+    "rule_id": {"type": ["string", "null"]},
+    "title": {"type": "string"},
+    "description": {"type": "string"},
+    "severity": {"enum": ["info", "low", "medium", "high", "critical", "unknown"]},
+    "location": {"type": "object"},
+    "scenario_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "classification": {"enum": ["true_positive", "false_positive", "unverified", "informational"]},
+    "raw_reference": {"type": "string"}
+  }
+}
+
